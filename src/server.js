@@ -38,12 +38,6 @@ app.get('/health', (_req, res) => {
   res.json({ ok: true, timestamp: now() });
 });
 
-app.get('/api/config', (_req, res) => {
-  res.json({
-    hasOpenAIKey: Boolean(process.env.OPENAI_API_KEY)
-  });
-});
-
 app.get('/api/sessions', (_req, res) => {
   res.json(storage.listSessions());
 });
@@ -84,14 +78,7 @@ app.get('/api/sessions/:id/messages', (req, res) => {
 
 app.post('/api/chat', async (req, res) => {
   try {
-    const {
-      sessionId,
-      prompt,
-      provider = 'demo',
-      model = 'gpt-4o-mini',
-      temperature = 0.2,
-      maxTokens = 300
-    } = req.body || {};
+    const { sessionId, prompt } = req.body || {};
 
     if (!sessionId || !String(prompt || '').trim()) {
       return res.status(400).json({ error: 'sessionId and prompt are required.' });
@@ -101,12 +88,8 @@ app.post('/api/chat', async (req, res) => {
     storage.addMessage({ sessionId, role: 'user', content: userContent, createdAt: now() });
 
     const context = storage.getMessages(sessionId, 20);
-    const service = new ChatService({ provider });
-    const reply = await service.reply(context, {
-      model: String(model),
-      temperature: Number(temperature),
-      maxTokens: Number(maxTokens)
-    });
+    const service = new ChatService();
+    const reply = await service.reply(context);
 
     storage.addMessage({
       sessionId,

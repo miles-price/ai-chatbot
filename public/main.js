@@ -1,8 +1,4 @@
 const api = {
-  async getConfig() {
-    const res = await fetch('/api/config');
-    return res.json();
-  },
   async getSessions() {
     const res = await fetch('/api/sessions');
     return res.json();
@@ -47,10 +43,6 @@ const deleteBtn = document.querySelector('#delete-chat-btn');
 const chatForm = document.querySelector('#chat-form');
 const promptInput = document.querySelector('#prompt');
 const messagesEl = document.querySelector('#chat-messages');
-const providerEl = document.querySelector('#provider');
-const modelEl = document.querySelector('#model');
-const temperatureEl = document.querySelector('#temperature');
-const maxTokensEl = document.querySelector('#max-tokens');
 const statusBannerEl = document.querySelector('#status-banner');
 const themeToggleEl = document.querySelector('#theme-toggle');
 
@@ -163,11 +155,7 @@ chatForm.addEventListener('submit', async (event) => {
 
   const result = await api.sendChat({
     sessionId: activeSessionId,
-    prompt,
-    provider: providerEl.value,
-    model: modelEl.value,
-    temperature: Number(temperatureEl.value),
-    maxTokens: Number(maxTokensEl.value)
+    prompt
   });
 
   if (result.error) {
@@ -176,10 +164,6 @@ chatForm.addEventListener('submit', async (event) => {
   }
 
   renderMessages(result.messages || []);
-
-  if (providerEl.value === 'openai' && String(result.reply || '').includes('switched to demo mode')) {
-    setBanner('OpenAI key is missing on this deployment, so chat is running in demo mode.');
-  }
 
   if ((result.messages || []).length === 2) {
     await api.renameSession(activeSessionId, prompt.slice(0, 50));
@@ -195,17 +179,7 @@ themeToggleEl.addEventListener('click', () => {
 (async function init() {
   const savedTheme = localStorage.getItem('theme') || 'light';
   applyTheme(savedTheme);
-
-  const config = await api.getConfig();
-  if (!config.hasOpenAIKey) {
-    const openAiOption = providerEl.querySelector('option[value="openai"]');
-    if (openAiOption) {
-      openAiOption.disabled = true;
-      openAiOption.textContent = 'openai (API key not configured)';
-    }
-    providerEl.value = 'demo';
-    setBanner('OpenAI key is not configured on this deployment. Demo mode is enabled.');
-  }
+  setBanner('Demo mode is enabled for reliable public access.');
 
   await refreshSessions();
   await refreshMessages();
