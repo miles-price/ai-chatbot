@@ -24,14 +24,38 @@ export class ChatService {
   }
 
   async openAiReply(messages, { model, temperature, maxTokens }) {
-    const response = await this.client.chat.completions.create({
-      model,
-      temperature,
-      max_tokens: maxTokens,
-      messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages]
-    });
+    try {
+      const response = await this.client.chat.completions.create({
+        model,
+        temperature,
+        max_tokens: maxTokens,
+        messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages]
+      });
 
-    return response.choices?.[0]?.message?.content?.trim() || 'No response generated.';
+      return response.choices?.[0]?.message?.content?.trim() || 'No response generated.';
+    } catch (error) {
+      const message = String(error?.message || '').toLowerCase();
+      const status = Number(error?.status || 0);
+
+      if (status === 429 || message.includes('quota') || message.includes('rate limit')) {
+        return (
+          'OpenAI quota/rate limit reached, so I switched to demo mode. ' +
+          this.demoReply(messages)
+        );
+      }
+
+      if (status === 401 || message.includes('api key')) {
+        return (
+          'OpenAI authentication failed, so I switched to demo mode. ' +
+          this.demoReply(messages)
+        );
+      }
+
+      return (
+        'OpenAI request failed, so I switched to demo mode. ' +
+        this.demoReply(messages)
+      );
+    }
   }
 
   demoReply(messages) {
