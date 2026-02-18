@@ -4,13 +4,12 @@ services:
     env: node
     plan: free
     autoDeploy: true
+    healthCheckPath: /health
     buildCommand: npm install
-    startCommand: npm start
+    startCommand: node src/server.js
     envVars:
       - key: NODE_VERSION
         value: 20
-      - key: PORT
-        value: 10000
       - key: CHAT_DB_PATH
         value: /tmp/chat.db
       - key: OPENAI_API_KEY
