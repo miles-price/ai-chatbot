@@ -4,7 +4,6 @@ A full-stack AI chatbot with persistent multi-session history.
 
 ## Live Demo
 
-- GitHub: https://github.com/miles-price/ai-chatbot
 - Live App: https://ai-chatbot-js.onrender.com
 
 ## Why I Built This
