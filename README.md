@@ -2,6 +2,11 @@
 
 A full-stack JavaScript AI chatbot with persistent multi-session history.
 
+## Live Demo
+
+- GitHub: https://github.com/miles-price/ai-chatbot
+- Live App: Add your deployed Render URL here
+
 ## Why I Built This
 
 I built this project to demonstrate cross-language versatility and production-style web engineering: REST APIs, persistent storage, client/server integration, configurable model settings, and deployment-ready app structure.
