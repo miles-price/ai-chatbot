@@ -1,27 +1,32 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Chatbot JS</title>
+    <title>AI Chatbot</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
     <div class="layout">
       <aside class="sidebar">
-        <h1>AI Chatbot JS</h1>
-        <p class="muted">Full-stack JavaScript project</p>
+        <div class="brand-row">
+          <div>
+            <h1>AI Chatbot</h1>
+            <p class="muted">Full-stack chatbot project</p>
+          </div>
+          <button id="theme-toggle" class="ghost" type="button">Dark</button>
+        </div>
 
-        <button id="new-chat-btn">+ New Chat</button>
+        <button id="new-chat-btn" type="button">+ New Chat</button>
 
         <label for="session-select">Sessions</label>
         <select id="session-select"></select>
 
         <label for="rename-input">Rename Session</label>
         <input id="rename-input" type="text" placeholder="Session title" />
-        <button id="rename-btn">Save Title</button>
+        <button id="rename-btn" type="button">Save Title</button>
 
-        <button id="delete-chat-btn" class="danger">Delete Session</button>
+        <button id="delete-chat-btn" class="danger" type="button">Delete Session</button>
 
         <hr />
 
@@ -42,6 +47,7 @@
       </aside>
 
       <main class="chat-pane">
+        <div id="status-banner" class="status hidden"></div>
         <div id="chat-messages" class="messages"></div>
 
         <form id="chat-form" class="chat-form">

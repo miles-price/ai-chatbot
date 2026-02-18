@@ -6,21 +6,24 @@ const SYSTEM_PROMPT =
 export class ChatService {
   constructor({ provider = 'demo', openAiApiKey = process.env.OPENAI_API_KEY } = {}) {
     this.provider = provider;
-    this.client = openAiApiKey ? new OpenAI({ apiKey: openAiApiKey }) : null;
+    this.hasOpenAIKey = Boolean(openAiApiKey);
+    this.client = this.hasOpenAIKey ? new OpenAI({ apiKey: openAiApiKey }) : null;
   }
 
   async reply(messages, { model = 'gpt-4o-mini', temperature = 0.2, maxTokens = 300 } = {}) {
     if (this.provider === 'openai') {
+      if (!this.client) {
+        return (
+          'OPENAI_API_KEY is not configured on this deployment, so I switched to demo mode. ' +
+          this.demoReply(messages)
+        );
+      }
       return this.openAiReply(messages, { model, temperature, maxTokens });
     }
     return this.demoReply(messages);
   }
 
   async openAiReply(messages, { model, temperature, maxTokens }) {
-    if (!this.client) {
-      throw new Error('OPENAI_API_KEY is missing. Set it in your environment or use demo mode.');
-    }
-
     const response = await this.client.chat.completions.create({
       model,
       temperature,

@@ -11,11 +11,8 @@ test('demo provider returns resume-oriented guidance', async () => {
   assert.equal(reply.length > 0, true);
 });
 
-test('openai provider without key throws a clear error', async () => {
+test('openai provider without key falls back to demo response', async () => {
   const service = new ChatService({ provider: 'openai', openAiApiKey: '' });
-
-  await assert.rejects(
-    () => service.reply([{ role: 'user', content: 'hello' }]),
-    /OPENAI_API_KEY is missing/
-  );
+  const reply = await service.reply([{ role: 'user', content: 'hello' }]);
+  assert.match(reply, /switched to demo mode/i);
 });

@@ -1,12 +1,31 @@
 :root {
-  --bg: #f5f8ff;
+  --bg: #f3f6fb;
   --panel: #ffffff;
-  --text: #1e2a39;
-  --muted: #6b7280;
+  --panel-2: #f8fafc;
+  --text: #0f172a;
+  --muted: #64748b;
   --primary: #0f766e;
-  --primary-2: #115e59;
-  --border: #d1d5db;
-  --danger: #b91c1c;
+  --primary-2: #0b5f58;
+  --danger: #dc2626;
+  --border: #dbe3ef;
+  --shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+  --user-bg: #dbeafe;
+  --assistant-bg: #ecfeff;
+}
+
+html[data-theme='dark'] {
+  --bg: #0b1220;
+  --panel: #111a2d;
+  --panel-2: #0f1728;
+  --text: #e5edf9;
+  --muted: #9db0cf;
+  --primary: #14b8a6;
+  --primary-2: #0d9f91;
+  --danger: #ef4444;
+  --border: #243049;
+  --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  --user-bg: #1e3a5f;
+  --assistant-bg: #103642;
 }
 
 * {
@@ -15,9 +34,12 @@
 
 body {
   margin: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(180deg, #edf2ff 0%, #f5f8ff 60%, #fefefe 100%);
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: var(--text);
+  background:
+    radial-gradient(circle at 10% -10%, rgba(15, 118, 110, 0.22), transparent 40%),
+    radial-gradient(circle at 90% 0%, rgba(59, 130, 246, 0.2), transparent 42%),
+    var(--bg);
 }
 
 .layout {
@@ -27,38 +49,49 @@ body {
 }
 
 .sidebar {
-  border-right: 1px solid var(--border);
   background: var(--panel);
+  border-right: 1px solid var(--border);
   padding: 18px;
   display: flex;
   flex-direction: column;
+  gap: 10px;
+  box-shadow: var(--shadow);
+  z-index: 2;
+}
+
+.brand-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   gap: 10px;
 }
 
 .sidebar h1 {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
 }
 
 .muted {
-  margin-top: -4px;
+  margin: 2px 0 0;
   color: var(--muted);
   font-size: 0.9rem;
 }
 
 label {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.84rem;
+  font-weight: 650;
 }
 
 input,
 select,
 button {
   width: 100%;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid var(--border);
-  padding: 10px;
+  padding: 10px 12px;
   font-size: 0.95rem;
+  color: var(--text);
+  background: var(--panel-2);
 }
 
 button {
@@ -66,47 +99,93 @@ button {
   color: #fff;
   border: none;
   cursor: pointer;
+  transition: transform 0.08s ease, background-color 0.16s ease;
 }
 
 button:hover {
   background: var(--primary-2);
 }
 
+button:active {
+  transform: translateY(1px);
+}
+
+button.ghost {
+  width: auto;
+  padding: 7px 11px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+button.ghost:hover {
+  background: var(--panel-2);
+}
+
 button.danger {
   background: var(--danger);
 }
 
+hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 6px 0;
+}
+
 .chat-pane {
   display: grid;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: auto 1fr auto;
   min-height: 100vh;
 }
 
+.status {
+  margin: 14px 16px 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(15, 118, 110, 0.15);
+  border: 1px solid rgba(15, 118, 110, 0.25);
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.status.hidden {
+  display: none;
+}
+
 .messages {
-  padding: 24px;
+  padding: 18px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
+.empty-state {
+  margin: auto;
+  text-align: center;
+  color: var(--muted);
+  max-width: 460px;
+  line-height: 1.5;
+}
+
 .message {
-  max-width: 760px;
+  max-width: min(760px, 92%);
   padding: 12px 14px;
   border-radius: 12px;
-  line-height: 1.4;
+  line-height: 1.45;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  white-space: pre-wrap;
 }
 
 .message.user {
   align-self: flex-end;
-  background: #dbeafe;
-  border: 1px solid #bfdbfe;
+  background: var(--user-bg);
 }
 
 .message.assistant {
   align-self: flex-start;
-  background: #ecfeff;
-  border: 1px solid #bae6fd;
+  background: var(--assistant-bg);
 }
 
 .chat-form {
@@ -114,7 +193,7 @@ button.danger {
   border-top: 1px solid var(--border);
   background: var(--panel);
   display: grid;
-  grid-template-columns: 1fr 110px;
+  grid-template-columns: 1fr 100px;
   gap: 10px;
 }
 

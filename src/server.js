@@ -38,6 +38,12 @@ app.get('/health', (_req, res) => {
   res.json({ ok: true, timestamp: now() });
 });
 
+app.get('/api/config', (_req, res) => {
+  res.json({
+    hasOpenAIKey: Boolean(process.env.OPENAI_API_KEY)
+  });
+});
+
 app.get('/api/sessions', (_req, res) => {
   res.json(storage.listSessions());
 });

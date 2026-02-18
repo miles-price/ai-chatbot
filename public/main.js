@@ -1,4 +1,8 @@
 const api = {
+  async getConfig() {
+    const res = await fetch('/api/config');
+    return res.json();
+  },
   async getSessions() {
     const res = await fetch('/api/sessions');
     return res.json();
@@ -47,11 +51,39 @@ const providerEl = document.querySelector('#provider');
 const modelEl = document.querySelector('#model');
 const temperatureEl = document.querySelector('#temperature');
 const maxTokensEl = document.querySelector('#max-tokens');
+const statusBannerEl = document.querySelector('#status-banner');
+const themeToggleEl = document.querySelector('#theme-toggle');
 
 let activeSessionId = null;
 
+function setBanner(text = '') {
+  if (!text) {
+    statusBannerEl.classList.add('hidden');
+    statusBannerEl.textContent = '';
+    return;
+  }
+
+  statusBannerEl.textContent = text;
+  statusBannerEl.classList.remove('hidden');
+}
+
+function applyTheme(theme) {
+  const next = theme === 'dark' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeToggleEl.textContent = next === 'dark' ? 'Light' : 'Dark';
+}
+
 function renderMessages(messages) {
   messagesEl.innerHTML = '';
+
+  if (!messages || messages.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.textContent = 'Start a new conversation. Try asking for debugging help, project feedback, or API design tips.';
+    messagesEl.appendChild(empty);
+    return;
+  }
 
   for (const msg of messages) {
     const div = document.createElement('div');
@@ -67,10 +99,10 @@ async function refreshSessions() {
   const sessions = await api.getSessions();
   sessionSelect.innerHTML = '';
 
-  sessions.forEach((session) => {
+  sessions.forEach((session, idx) => {
     const opt = document.createElement('option');
     opt.value = session.id;
-    opt.textContent = `${session.title} (${session.id.slice(0, 8)})`;
+    opt.textContent = session.title || `Chat ${idx + 1}`;
     sessionSelect.appendChild(opt);
   });
 
@@ -126,6 +158,7 @@ chatForm.addEventListener('submit', async (event) => {
   if (!prompt || !activeSessionId) return;
 
   promptInput.value = '';
+  setBanner('');
 
   const result = await api.sendChat({
     sessionId: activeSessionId,
@@ -137,11 +170,15 @@ chatForm.addEventListener('submit', async (event) => {
   });
 
   if (result.error) {
-    alert(result.error);
+    setBanner(result.error);
     return;
   }
 
   renderMessages(result.messages || []);
+
+  if (providerEl.value === 'openai' && String(result.reply || '').includes('switched to demo mode')) {
+    setBanner('OpenAI key is missing on this deployment, so chat is running in demo mode.');
+  }
 
   if ((result.messages || []).length === 2) {
     await api.renameSession(activeSessionId, prompt.slice(0, 50));
@@ -149,7 +186,26 @@ chatForm.addEventListener('submit', async (event) => {
   }
 });
 
+themeToggleEl.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  applyTheme(current === 'light' ? 'dark' : 'light');
+});
+
 (async function init() {
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  applyTheme(savedTheme);
+
+  const config = await api.getConfig();
+  if (!config.hasOpenAIKey) {
+    const openAiOption = providerEl.querySelector('option[value="openai"]');
+    if (openAiOption) {
+      openAiOption.disabled = true;
+      openAiOption.textContent = 'openai (API key not configured)';
+    }
+    providerEl.value = 'demo';
+    setBanner('OpenAI key is not configured on this deployment. Demo mode is enabled.');
+  }
+
   await refreshSessions();
   await refreshMessages();
 })();

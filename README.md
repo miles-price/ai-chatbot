@@ -1,6 +1,6 @@
-# AI Chatbot (JavaScript)
+# AI Chatbot
 
-A full-stack JavaScript AI chatbot with persistent multi-session history.
+A full-stack AI chatbot with persistent multi-session history.
 
 ## Live Demo
 
