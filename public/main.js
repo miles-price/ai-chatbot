@@ -80,7 +80,8 @@ function renderMessages(messages) {
   if (!messages || messages.length === 0) {
     const empty = document.createElement('div');
     empty.className = 'empty-state';
-    empty.textContent = 'Start a new conversation. Try asking for debugging help, project feedback, or API design tips.';
+    empty.textContent =
+      'Start a new conversation. Try: "Rewrite this resume bullet", "Help debug this error", or "Design a REST API for a task app".';
     messagesEl.appendChild(empty);
     return;
   }
