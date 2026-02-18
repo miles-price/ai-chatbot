@@ -1,0 +1,22 @@
+{
+  "name": "ai-chatbot-js",
+  "version": "1.0.0",
+  "description": "Full-stack JavaScript AI chatbot with persistent chat history",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node src/server.js",
+    "start": "NODE_ENV=production node src/server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "openai": "^4.85.4"
+  }
+}

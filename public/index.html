@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Chatbot JS</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h1>AI Chatbot JS</h1>
+        <p class="muted">Full-stack JavaScript project</p>
+
+        <button id="new-chat-btn">+ New Chat</button>
+
+        <label for="session-select">Sessions</label>
+        <select id="session-select"></select>
+
+        <label for="rename-input">Rename Session</label>
+        <input id="rename-input" type="text" placeholder="Session title" />
+        <button id="rename-btn">Save Title</button>
+
+        <button id="delete-chat-btn" class="danger">Delete Session</button>
+
+        <hr />
+
+        <label for="provider">Provider</label>
+        <select id="provider">
+          <option value="demo">demo</option>
+          <option value="openai">openai</option>
+        </select>
+
+        <label for="model">Model</label>
+        <input id="model" type="text" value="gpt-4o-mini" />
+
+        <label for="temperature">Temperature</label>
+        <input id="temperature" type="number" step="0.1" min="0" max="1" value="0.2" />
+
+        <label for="max-tokens">Max Tokens</label>
+        <input id="max-tokens" type="number" min="64" max="1200" value="300" />
+      </aside>
+
+      <main class="chat-pane">
+        <div id="chat-messages" class="messages"></div>
+
+        <form id="chat-form" class="chat-form">
+          <input id="prompt" type="text" placeholder="Ask a question about software engineering..." required />
+          <button type="submit">Send</button>
+        </form>
+      </main>
+    </div>
+
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
