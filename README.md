@@ -50,10 +50,16 @@ CHAT_DB_PATH=chat.db
 npm test
 ```
 
-## Deploy Options
+## Publish For Showcase (Render)
 
-- Render / Railway / Fly.io for the Node app
-- Or Dockerize and deploy anywhere that supports Node
+This repo includes `render.yaml` for quick deployment.
+
+1. Go to https://render.com and sign in with GitHub.
+2. Click `New` -> `Blueprint`.
+3. Select this repository: `miles-price/ai-chatbot`.
+4. Confirm service name `ai-chatbot-js` and deploy.
+5. (Optional) Add `OPENAI_API_KEY` in Render environment variables to enable real LLM mode.
+6. Open the generated Render URL and use `demo` mode by default.
 
 ## Security Notes
 
