@@ -14,7 +14,7 @@ I built this project to demonstrate cross-language versatility and production-st
 ## Features
 
 - Multi-session chat with create/rename/delete flows
-- Persistent history using SQLite (`better-sqlite3`)
+- Persistent history using local JSON storage
 - Express backend API + browser frontend
 - Two providers:
   - `demo` mode (works without external API keys)
@@ -26,7 +26,7 @@ I built this project to demonstrate cross-language versatility and production-st
 
 - JavaScript (Node.js + browser)
 - Express
-- SQLite (`better-sqlite3`)
+- File-based JSON persistence
 - OpenAI SDK
 
 ## Local Setup
@@ -46,7 +46,7 @@ Create `.env` (optional for OpenAI mode):
 ```bash
 OPENAI_API_KEY=your_api_key_here
 PORT=3000
-CHAT_DB_PATH=chat.db
+CHAT_DB_PATH=chat.json
 ```
 
 ## Run Tests

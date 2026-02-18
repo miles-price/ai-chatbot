@@ -11,6 +11,6 @@ services:
       - key: NODE_VERSION
         value: 20
       - key: CHAT_DB_PATH
-        value: /tmp/chat.db
+        value: /tmp/chat.json
       - key: OPENAI_API_KEY
         sync: false

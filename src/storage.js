@@ -1,83 +1,97 @@
-import Database from 'better-sqlite3';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const DEFAULT_DATA = { sessions: [], messages: [] };
 
 export class ChatStorage {
-  constructor(dbPath = 'chat.db') {
-    this.db = new Database(dbPath);
+  constructor(dataPath = 'chat.json') {
+    this.dataPath = dataPath;
     this.init();
   }
 
   init() {
-    this.db.exec(`
-      CREATE TABLE IF NOT EXISTS sessions (
-        id TEXT PRIMARY KEY,
-        title TEXT NOT NULL,
-        created_at TEXT NOT NULL
-      );
+    if (!fs.existsSync(this.dataPath)) {
+      this.write(DEFAULT_DATA);
+      return;
+    }
 
-      CREATE TABLE IF NOT EXISTS messages (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        session_id TEXT NOT NULL,
-        role TEXT NOT NULL,
-        content TEXT NOT NULL,
-        created_at TEXT NOT NULL,
-        FOREIGN KEY(session_id) REFERENCES sessions(id)
-      );
-    `);
+    try {
+      const raw = fs.readFileSync(this.dataPath, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed.sessions) || !Array.isArray(parsed.messages)) {
+        this.write(DEFAULT_DATA);
+      }
+    } catch {
+      this.write(DEFAULT_DATA);
+    }
+  }
+
+  read() {
+    const raw = fs.readFileSync(this.dataPath, 'utf-8');
+    return JSON.parse(raw);
+  }
+
+  write(payload) {
+    const dir = path.dirname(this.dataPath);
+    if (dir && dir !== '.') {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(this.dataPath, JSON.stringify(payload, null, 2), 'utf-8');
   }
 
   listSessions() {
-    const stmt = this.db.prepare(
-      'SELECT id, title, created_at FROM sessions ORDER BY created_at DESC'
-    );
-    return stmt.all();
+    const data = this.read();
+    return [...data.sessions].sort((a, b) => b.created_at.localeCompare(a.created_at));
   }
 
   createSession({ id, title, createdAt }) {
-    const stmt = this.db.prepare(
-      'INSERT INTO sessions (id, title, created_at) VALUES (?, ?, ?)'
-    );
-    stmt.run(id, title, createdAt);
+    const data = this.read();
+    data.sessions.push({ id, title, created_at: createdAt });
+    this.write(data);
   }
 
   renameSession(id, title) {
-    const stmt = this.db.prepare('UPDATE sessions SET title = ? WHERE id = ?');
-    stmt.run(title, id);
+    const data = this.read();
+    const session = data.sessions.find((s) => s.id === id);
+    if (session) {
+      session.title = title;
+      this.write(data);
+    }
   }
 
   deleteSession(id) {
-    this.db.prepare('DELETE FROM messages WHERE session_id = ?').run(id);
-    this.db.prepare('DELETE FROM sessions WHERE id = ?').run(id);
+    const data = this.read();
+    data.sessions = data.sessions.filter((s) => s.id !== id);
+    data.messages = data.messages.filter((m) => m.session_id !== id);
+    this.write(data);
   }
 
   addMessage({ sessionId, role, content, createdAt }) {
-    const stmt = this.db.prepare(
-      'INSERT INTO messages (session_id, role, content, created_at) VALUES (?, ?, ?, ?)'
-    );
-    stmt.run(sessionId, role, content, createdAt);
+    const data = this.read();
+    data.messages.push({
+      id: data.messages.length + 1,
+      session_id: sessionId,
+      role,
+      content,
+      created_at: createdAt
+    });
+    this.write(data);
   }
 
   getMessages(sessionId, limit = 20) {
-    const stmt = this.db.prepare(
-      `SELECT role, content FROM (
-         SELECT role, content, id
-         FROM messages
-         WHERE session_id = ?
-         ORDER BY id DESC
-         LIMIT ?
-       )
-       ORDER BY id ASC`
-    );
-    return stmt.all(sessionId, limit);
+    const data = this.read();
+    return data.messages
+      .filter((m) => m.session_id === sessionId)
+      .slice(-limit)
+      .map((m) => ({ role: m.role, content: m.content }));
   }
 
   getAllMessages(sessionId) {
-    const stmt = this.db.prepare(
-      'SELECT role, content FROM messages WHERE session_id = ? ORDER BY id ASC'
-    );
-    return stmt.all(sessionId);
+    const data = this.read();
+    return data.messages
+      .filter((m) => m.session_id === sessionId)
+      .map((m) => ({ role: m.role, content: m.content }));
   }
 
-  close() {
-    this.db.close();
-  }
+  close() {}
 }
